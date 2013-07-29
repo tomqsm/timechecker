@@ -22,7 +22,7 @@ public class Work implements Identifiable {
     public Project getProject() {
         return project;
     }
-
+    
     public void setProject(Project project) {
         this.project = project;
     }
@@ -43,6 +43,5 @@ public class Work implements Identifiable {
 
     public void setId(int id) {
         this.id = id;
-    }
-    
+    }   
 }

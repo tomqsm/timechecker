@@ -11,6 +11,7 @@ public enum ActivityEnum {
     ANALYSIS("Analysis of a problem in order to build understanding of its structure."),
     DESIGN("Designing a solution."),
     TESTING("Testing implemented code."),
+    ADMIN("Administrative tasks."),
     MEETING("Meeting.");
     private String desc;
 

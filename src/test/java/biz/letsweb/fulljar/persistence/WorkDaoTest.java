@@ -40,7 +40,7 @@ public class WorkDaoTest {
     }
 
     /**
-     * // * Test of create method, of class WorkDao.
+     * Test of create method, of class WorkDao.
      */
     @Test
     public void testCreate() {

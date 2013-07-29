@@ -1,6 +1,6 @@
 package biz.letsweb.fulljar.persistence;
 
-import java.util.Iterator;
+import java.util.List;
 
 /**
  *
@@ -9,7 +9,7 @@ import java.util.Iterator;
 public interface Crudable <T>{
     void create(final T t);
     T find(final int id);
-    Iterator<T> findAll();
+    List<T> findAll();
     T findLast();
     void update(final T t);
     void delete(final T t);

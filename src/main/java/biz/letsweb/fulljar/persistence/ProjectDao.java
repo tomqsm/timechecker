@@ -1,14 +1,14 @@
 package biz.letsweb.fulljar.persistence;
 
 import biz.letsweb.fulljar.FulljarRuntimeException;
-import biz.letsweb.fulljar.domain.Activity;
 import biz.letsweb.fulljar.domain.Project;
 import biz.letsweb.fulljar.jdbc.JdbcUtils;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,8 +25,8 @@ public class ProjectDao implements Crudable<Project> {
     public void create(final Project project) {
         final String sql = String.format("INSERT INTO %s VALUES (null, '%s', '%s')", tableName, project.getName(), project.getDesc());
         LOG.trace("Executing: {}", sql);
-        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection()) {
-            Statement stmt = con.createStatement();
+        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection();
+                final Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
         } catch (final SQLException ex) {
             throw new FulljarRuntimeException(String.format("Sql %s could not be executed.", sql), ex);
@@ -40,9 +40,24 @@ public class ProjectDao implements Crudable<Project> {
     }
 
     @Override
-    public Iterator<Project> findAll() {
-        String sql = String.format("SELECT * FROM %s", tableName);
-        return null;
+    public List<Project> findAll() {
+        List<Project> list = new ArrayList<Project>();
+        final String sql = String.format("SELECT * FROM %s;", tableName);
+        LOG.trace("Executing: {}", sql);
+        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection();
+                final Statement stmt = con.createStatement();
+                final ResultSet rs = stmt.executeQuery(sql);) {
+            while (rs.next()) {
+                Project p = new Project();
+                p.setId(rs.getInt(1));
+                p.setName(rs.getString(2));
+                p.setDesc(rs.getString(3));
+                list.add(p);
+            }
+        } catch (final SQLException ex) {
+            throw new FulljarRuntimeException(String.format("Sql %s could not be executed: %s.", sql, ex.getMessage()), ex);
+        }
+        return list;
     }
 
     @Override
@@ -61,9 +76,9 @@ public class ProjectDao implements Crudable<Project> {
         Project p = null;
         final String sql = "SELECT * FROM projects WHERE id=(SELECT MAX(id) FROM projects);";
         LOG.trace("Executing: {}", sql);
-        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection()) {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection();
+                final Statement stmt = con.createStatement();
+                final ResultSet rs = stmt.executeQuery(sql);) {
             p = new Project();
             while (rs.next()) {
                 p.setId(rs.getInt(1));

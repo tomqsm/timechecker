@@ -7,7 +7,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Iterator;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +28,8 @@ public class WorkDao implements Crudable<Work> {
                 work.getActivity().getId(),
                 work.getProject().getId());
         LOG.trace("Executing: {}", sql);
-        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection()) {
-            Statement stmt = con.createStatement();
+        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection();
+                final Statement stmt = con.createStatement();) {
             stmt.executeUpdate(sql);
         } catch (final SQLException ex) {
             throw new FulljarRuntimeException(String.format("Sql %s could not be executed: %s.", sql, ex.getMessage()), ex);
@@ -41,11 +41,11 @@ public class WorkDao implements Crudable<Work> {
         Work work = null;
         final String sql = "SELECT w.id, w.change_time, w.change_type, p.name, a.name FROM works w JOIN projects p ON w.id_project=p.id JOIN activities a ON w.id_activity=a.id WHERE w.id=(SELECT MAX(id) FROM works);";
         LOG.trace("Executing: {}", sql);
-        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection()) {
-            Statement stmt = con.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+        try (final Connection con = JdbcUtils.getConfiguredDataSource().getConnection();
+                final Statement stmt = con.createStatement();
+                final ResultSet rs = stmt.executeQuery(sql);) {
             work = new Work();
-            while(rs.next()){
+            while (rs.next()) {
                 work.setId(rs.getInt(0));
                 work.setChangeTime(rs.getString(1));
                 System.out.println(rs.getString(3));
@@ -62,7 +62,7 @@ public class WorkDao implements Crudable<Work> {
     }
 
     @Override
-    public Iterator<Work> findAll() {
+    public List<Work> findAll() {
         return null;
     }
 
