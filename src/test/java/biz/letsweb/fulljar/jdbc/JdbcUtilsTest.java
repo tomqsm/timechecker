@@ -16,22 +16,22 @@ import static org.junit.Assert.*;
  * @author Tomasz
  */
 public class JdbcUtilsTest {
-    
+
     public JdbcUtilsTest() {
     }
-    
+
     @BeforeClass
     public static void setUpClass() {
     }
-    
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
@@ -42,7 +42,6 @@ public class JdbcUtilsTest {
     @Test
     public void testLoadSqliteDriver() {
         System.out.println("loadSqliteDriver");
-        JdbcUtils.loadSqliteDriver();
-        assertTrue(true);
+        assertNotNull(JdbcUtils.getConfiguredDataSource());
     }
 }

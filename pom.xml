@@ -6,12 +6,18 @@
     <artifactId>fulljar</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>jar</packaging>
+    
+    <!--    <parent>
+        <groupId>biz.letsweb.administrative</groupId>
+        <artifactId>administrative</artifactId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>-->
 
     <name>fulljar</name>
-    <url>http://maven.apache.org</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <classpath.prefix>lib</classpath.prefix>
     </properties>
 
@@ -34,6 +40,24 @@
             <version>3.7.15-M1</version>
             <scope>compile</scope>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>2.4</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>joda-time</groupId>
+            <artifactId>joda-time</artifactId>
+            <version>2.2</version>
+        </dependency>
+            
     </dependencies>
     <build>
         <plugins>
@@ -46,7 +70,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>${classpath.prefix}</classpathPrefix>
-                            <mainClass>biz.letsweb.fulljar.App</mainClass>
+                            <mainClass>biz.letsweb.fulljar.Application</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -72,13 +96,28 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.6</version>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.3.2</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>
     </build>
+    <scm>
+        <connection>scm:git:git://github.com:tomqsm/timechecker.git</connection>
+        <developerConnection>scm:git:ssh://github.com:tomqsm/timechecker.git</developerConnection>
+        <url>https://github.com/tomqsm/timechecker</url>
+        <tag>HEAD</tag>
+    </scm>
 </project>
