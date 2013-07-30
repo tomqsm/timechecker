@@ -64,7 +64,6 @@ public class WorkDaoTest {
 
         Project retrievedProject = projectDao.findLast();
 
-
         Work work = new Work();
         work.setActivity(retrievedActivity);
         work.setProject(retrievedProject);
