@@ -1,6 +1,6 @@
 package biz.letsweb.fulljar.jdbc;
 
-import biz.letsweb.fulljar.Constants;
+import biz.letsweb.fulljar.CommonsConfig;
 import biz.letsweb.fulljar.FulljarRuntimeException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,33 +21,35 @@ import org.sqlite.javax.SQLiteConnectionPoolDataSource;
  */
 public class JdbcUtils {
 
-    private static Logger LOG = LoggerFactory.getLogger(JdbcUtils.class);
-    private static DataSource DATA_SOURCE = null;
+    private final static Logger LOG = LoggerFactory.getLogger(JdbcUtils.class);
+    private static SQLiteConnectionPoolDataSource DATA_SOURCE = null;
 
     public static synchronized DataSource getConfiguredDataSource() {
         if (DATA_SOURCE == null) {
-            SQLiteConfig config = new SQLiteConfig();
+            final SQLiteConfig config = new SQLiteConfig();
             config.enforceForeignKeys(true);
-            config.setEncoding(SQLiteConfig.Encoding.getEncoding(Constants.APPLICATION_PROPERTIES.getProperty("default.encoding")));
+            config.setEncoding(SQLiteConfig.Encoding.getEncoding(CommonsConfig.APP_PROPS.getString("encoding")));
             config.setDateClass("INTEGER");
-            config.setDateStringFormat(Constants.APPLICATION_PROPERTIES.getProperty("db.date.format"));
-            SQLiteConnectionPoolDataSource dataSource = new SQLiteConnectionPoolDataSource();
-            dataSource.setUrl(Constants.APPLICATION_PROPERTIES.getProperty("db.url"));
-            dataSource.setConfig(config);
-            return dataSource;
+            config.setDateStringFormat(CommonsConfig.APP_PROPS.getString("db.date.format"));
+            DATA_SOURCE = new SQLiteConnectionPoolDataSource();
+            DATA_SOURCE.setUrl(CommonsConfig.APP_PROPS.getString("db.url"));
+            DATA_SOURCE.setConfig(config);
+            LOG.trace("Using a new data source.");
+            return DATA_SOURCE;
         } else {
+            LOG.trace("Using an existing data source.");
             return DATA_SOURCE;
         }
     }
 
     public static void setupTables() {
         LOG.trace("Setting up tables.");
-        try (Connection connection = getConfiguredDataSource().getConnection()) {
-            Statement statement = connection.createStatement();
+        try (final Connection connection = getConfiguredDataSource().getConnection();
+                Statement statement = connection.createStatement()) {
             statement.setQueryTimeout(30);  // set timeout to 30 sec.
             statement.executeUpdate(loadCreateTablesSql());
         } catch (SQLException e) {
-            System.err.println(e.getMessage());
+            throw new FulljarRuntimeException("Couldn't setup tables. " + e.getMessage(), e);
         }
     }
 
@@ -59,9 +61,9 @@ public class JdbcUtils {
     private static String loadCreateTablesSql() {
         LOG.trace("Loading create table sql script.");
         String sql = null;
-        try (InputStream is = JdbcUtils.class.getClassLoader().getResourceAsStream("create.sql")) {
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(is, writer, Constants.APPLICATION_PROPERTIES.getProperty("default.encoding"));
+        try (InputStream is = JdbcUtils.class.getClassLoader().getResourceAsStream("create.sql");
+                StringWriter writer = new StringWriter()) {
+            IOUtils.copy(is, writer, CommonsConfig.APP_PROPS.getString("encoding"));
             sql = writer.toString();
         } catch (IOException ex) {
             throw new FulljarRuntimeException("Couldn't load sql script. ", ex);

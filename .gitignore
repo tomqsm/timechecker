@@ -1,2 +1,6 @@
 start.bat
 target
+bin
+projects
+*.db
+*.bat
